@@ -25,11 +25,15 @@ export const signUp = async (email: string, password: string, userData: {
 
     // Create profile after successful signup
     if (data.user) {
+      // Wait a moment for the auth user to be fully created
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
           id: data.user.id,
           full_name: userData.full_name,
+          role: 'donor', // Explicitly set role
           phone: userData.phone || null,
           city: userData.city || null,
           blood_group: userData.blood_group as any || null,

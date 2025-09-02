@@ -29,7 +29,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentUser = await getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error('Error fetching user:', error);
+      // Only log non-policy errors to avoid spam
+      if (error && (error as any).code !== '42P17') {
+        console.error('Error fetching user:', error);
+      }
       setUser(null);
     }
   };
