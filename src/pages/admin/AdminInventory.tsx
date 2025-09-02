@@ -5,7 +5,7 @@ import { Modal } from '../../components/ui/Modal';
 import { InventoryForm } from '../../components/forms/InventoryForm';
 import { InventoryTable } from '../../components/data-display/InventoryTable';
 import { useToast } from '../../components/ui/Toast';
-import { getInventory, createInventoryItem, updateInventoryItem, deleteInventoryItem } from '../../lib/api/inventory';
+import { getInventoryItems, createInventoryItem, updateInventoryItem, deleteInventoryItem } from '../../lib/api/inventory';
 import type { InventoryItem } from '../../types/database';
 
 export function AdminInventory() {
@@ -21,7 +21,7 @@ export function AdminInventory() {
 
   const loadInventory = async () => {
     try {
-      const data = await getInventory();
+      const data = await getInventoryItems(true);
       setInventory(data);
     } catch (error) {
       showToast('Failed to load inventory', 'error');
