@@ -12,32 +12,37 @@ export const signUp = async (email: string, password: string, userData: {
   city?: string;
   blood_group?: string;
 }) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: userData,
-    },
-  });
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: undefined,
+      },
+    });
 
-  if (error) throw error;
+    if (error) throw error;
 
-  // Create profile after successful signup
-  if (data.user) {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: data.user.id,
-        full_name: userData.full_name,
-        phone: userData.phone || null,
-        city: userData.city || null,
-        blood_group: userData.blood_group as any || null,
-      });
+    // Create profile after successful signup
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          full_name: userData.full_name,
+          phone: userData.phone || null,
+          city: userData.city || null,
+          blood_group: userData.blood_group as any || null,
+        });
 
-    if (profileError) throw profileError;
+      if (profileError) throw profileError;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error during signup:', error);
+    throw error;
   }
-
-  return data;
 };
 
 export const signIn = async (email: string, password: string) => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HeartIcon, UserGroupIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
+import { Button } from '../../components/ui/Button';
 import { SearchForm } from '../../components/forms/SearchForm';
 import { NoticesList } from '../../components/data-display/NoticesList';
 import { getActiveNotices } from '../../lib/api/notices';

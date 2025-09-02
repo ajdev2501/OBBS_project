@@ -22,6 +22,14 @@ export const InventorySchema = z.object({
   storage_location: z.string().min(2, 'Storage location is required'),
   collected_on: z.string(),
   expires_on: z.string(),
+}).refine((data) => {
+  const collected = new Date(data.collected_on);
+  const expires = new Date(data.expires_on);
+  const diffDays = Math.floor((expires.getTime() - collected.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays >= 1 && diffDays <= 42;
+}, {
+  message: "Expiry date must be 1-42 days after collection date",
+  path: ["expires_on"],
 });
 
 export const RequestSchema = z.object({

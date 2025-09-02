@@ -12,8 +12,8 @@ export const calculateFEFOAllocation = async (
   requestedUnits: number
 ): Promise<FEFOAllocation> => {
   try {
-    // Get available units sorted by expiry date (FEFO - First Expire First Out)
-    const availableUnits = await getUnitsForAllocation(bloodGroup, requestedUnits);
+    // Get more units than requested to ensure we have options
+    const availableUnits = await getUnitsForAllocation(bloodGroup, requestedUnits * 2);
     
     if (!availableUnits || availableUnits.length === 0) {
       return {
@@ -26,7 +26,7 @@ export const calculateFEFOAllocation = async (
     // Take the earliest expiring units up to the requested quantity
     const selectedUnits = availableUnits.slice(0, requestedUnits);
     const totalVolume = selectedUnits.reduce((sum, unit) => sum + unit.volume_ml, 0);
-    const canFulfill = selectedUnits.length >= requestedUnits;
+    const canFulfill = selectedUnits.length === requestedUnits;
 
     return {
       inventoryItems: selectedUnits,

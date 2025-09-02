@@ -32,6 +32,9 @@ export const AllocationModal: React.FC<AllocationModalProps> = ({
     if (isOpen && request) {
       loadAllocation();
     }
+    if (!isOpen) {
+      setAllocation(null);
+    }
   }, [isOpen, request]);
 
   const loadAllocation = async () => {

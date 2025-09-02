@@ -41,33 +41,38 @@ export const updateRequestStatus = async (id: string, status: BloodRequest['stat
 };
 
 export const fulfillRequest = async (requestId: string, inventoryIds: string[]) => {
-  // Start transaction-like operations
-  const { error: updateRequestError } = await supabase
-    .from('requests')
-    .update({ status: 'fulfilled' })
-    .eq('id', requestId);
+  try {
+    // Update request status to fulfilled
+    const { error: updateRequestError } = await supabase
+      .from('requests')
+      .update({ status: 'fulfilled' })
+      .eq('id', requestId);
 
-  if (updateRequestError) throw updateRequestError;
+    if (updateRequestError) throw updateRequestError;
 
-  // Update inventory status to fulfilled
-  const { error: updateInventoryError } = await supabase
-    .from('inventory')
-    .update({ status: 'fulfilled' })
-    .in('id', inventoryIds);
+    // Update inventory status to fulfilled
+    const { error: updateInventoryError } = await supabase
+      .from('inventory')
+      .update({ status: 'fulfilled' })
+      .in('id', inventoryIds);
 
-  if (updateInventoryError) throw updateInventoryError;
+    if (updateInventoryError) throw updateInventoryError;
 
-  // Create allocations
-  const allocations = inventoryIds.map(inventoryId => ({
-    request_id: requestId,
-    inventory_id: inventoryId,
-  }));
+    // Create allocations
+    const allocations = inventoryIds.map(inventoryId => ({
+      request_id: requestId,
+      inventory_id: inventoryId,
+    }));
 
-  const { error: allocationError } = await supabase
-    .from('allocations')
-    .insert(allocations);
+    const { error: allocationError } = await supabase
+      .from('allocations')
+      .insert(allocations);
 
-  if (allocationError) throw allocationError;
+    if (allocationError) throw allocationError;
 
-  return true;
+    return true;
+  } catch (error) {
+    console.error('Error fulfilling request:', error);
+    throw error;
+  }
 };

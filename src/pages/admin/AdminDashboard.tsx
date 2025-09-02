@@ -6,9 +6,11 @@ import { AllocationModal } from '../../components/data-display/AllocationModal';
 import { getInventoryItems, discardExpiredUnits } from '../../lib/api/inventory';
 import { getRequests, updateRequestStatus } from '../../lib/api/requests';
 import { getAllProfiles } from '../../lib/api/profiles';
+import { getActiveNotices } from '../../lib/api/notices';
 import { useRealTimeUpdates } from '../../hooks/useRealTimeUpdates';
+import { NoticesList } from '../../components/data-display/NoticesList';
 import { useToast } from '../../components/ui/Toast';
-import type { BloodRequest } from '../../types/database';
+import type { BloodRequest, Notice } from '../../types/database';
 
 export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState({
@@ -20,6 +22,7 @@ export const AdminDashboard: React.FC = () => {
   const [inventoryData, setInventoryData] = useState<Record<string, number>>({});
   const [selectedRequest, setSelectedRequest] = useState<BloodRequest | null>(null);
   const [allocationModalOpen, setAllocationModalOpen] = useState(false);
+  const [notices, setNotices] = useState<(Notice & { created_by_profile: { full_name: string } })[]>([]);
   const { showToast } = useToast();
 
   const { data: requests, refetch: refetchRequests } = useRealTimeUpdates<BloodRequest>('requests');
@@ -36,11 +39,14 @@ export const AdminDashboard: React.FC = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [inventoryItems, allRequests, profiles] = await Promise.all([
+      const [inventoryItems, allRequests, profiles, noticesData] = await Promise.all([
         getInventoryItems(true),
         getRequests(),
         getAllProfiles(),
+        getActiveNotices(),
       ]);
+
+      setNotices(noticesData as any);
 
       // Calculate inventory by blood group
       const inventoryByGroup: Record<string, number> = {};

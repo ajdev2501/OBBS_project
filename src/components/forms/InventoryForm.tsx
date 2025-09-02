@@ -27,10 +27,17 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   loading = false,
   initialData
 }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<InventoryFormData>({
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<InventoryFormData>({
     resolver: zodResolver(InventorySchema),
     defaultValues: initialData,
   });
+
+  const collectedDate = watch('collected_on');
+  
+  // Calculate minimum expiry date (collected date + 1 day)
+  const minExpiryDate = collectedDate 
+    ? new Date(new Date(collectedDate).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    : undefined;
 
   const bloodGroupOptions = bloodGroups.map(group => ({ value: group, label: group }));
 
@@ -78,8 +85,10 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         <Input
           label="Expiry Date *"
           type="date"
+          min={minExpiryDate}
           {...register('expires_on')}
           error={errors.expires_on?.message}
+          helperText="Blood units typically expire 35-42 days after collection"
         />
       </div>
 

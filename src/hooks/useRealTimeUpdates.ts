@@ -14,7 +14,11 @@ export const useRealTimeUpdates = <T>(
     const fetchData = async () => {
       try {
         setLoading(true);
-        let query = supabase.from(table).select('*');
+        let query = supabase.from(table).select(`
+          *,
+          ${table === 'inventory' ? 'created_by_profile:profiles!created_by(full_name)' : ''}
+          ${table === 'notices' ? 'created_by_profile:profiles!created_by(full_name)' : ''}
+        `.trim());
         
         if (filter) {
           query = query.eq(filter.column, filter.value);
@@ -37,7 +41,7 @@ export const useRealTimeUpdates = <T>(
 
     // Set up real-time subscription
     const channel = supabase
-      .channel(`realtime_${table}`)
+      .channel(`realtime_${table}_${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -63,7 +67,12 @@ export const useRealTimeUpdates = <T>(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [table, filter?.column, filter?.value, ...dependencies]);
+  }, [table, JSON.stringify(filter), ...dependencies]);
 
-  return { data, loading, error, refetch: () => setLoading(true) };
+  const refetch = () => {
+    setLoading(true);
+    setError(null);
+  };
+
+  return { data, loading, error, refetch };
 };

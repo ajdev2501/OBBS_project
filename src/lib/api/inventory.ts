@@ -4,7 +4,10 @@ import type { InventoryItem, BloodGroup } from '../../types/database';
 export const getAvailability = async (bloodGroup?: BloodGroup, city?: string) => {
   let query = supabase
     .from('inventory')
-    .select('blood_group, city:profiles!created_by(city)')
+    .select(`
+      blood_group,
+      profiles!created_by(city)
+    `)
     .eq('status', 'available')
     .gte('expires_on', new Date().toISOString().split('T')[0]);
 
@@ -18,9 +21,9 @@ export const getAvailability = async (bloodGroup?: BloodGroup, city?: string) =>
   // Aggregate by blood group and city
   const aggregated: Record<string, Record<string, number>> = {};
   
-  data?.forEach((item: any) => {
+  data?.forEach((item) => {
     const group = item.blood_group;
-    const itemCity = item.city?.city || 'Unknown';
+    const itemCity = item.profiles?.city || 'Unknown';
     
     if (!aggregated[group]) aggregated[group] = {};
     if (!aggregated[group][itemCity]) aggregated[group][itemCity] = 0;
@@ -91,7 +94,7 @@ export const getUnitsForAllocation = async (bloodGroup: BloodGroup, quantity: nu
     .eq('status', 'available')
     .gte('expires_on', new Date().toISOString().split('T')[0])
     .order('expires_on', { ascending: true })
-    .limit(quantity);
+    .limit(Math.max(quantity, 10)); // Get more units than needed for better allocation
 
   if (error) throw error;
   return data;
