@@ -17,29 +17,47 @@ export const signUp = async (email: string, password: string, userData: {
       email,
       password,
       options: {
-        emailRedirectTo: undefined,
+        emailRedirectTo: `${window.location.origin}/login`,
       },
     });
 
     if (error) throw error;
 
-    // Create profile after successful signup
-    if (data.user) {
-      // Wait a moment for the auth user to be fully created
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+    // Only create profile if user was actually created (not just pending email confirmation)
+    if (data.user && !data.user.email_confirmed_at) {
+      // For email confirmation disabled, create profile immediately
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
           id: data.user.id,
           full_name: userData.full_name,
-          role: 'donor', // Explicitly set role
+          role: 'donor',
           phone: userData.phone || null,
           city: userData.city || null,
           blood_group: userData.blood_group as any || null,
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        // Don't throw here as the user account was created successfully
+        // The profile can be created later when they first sign in
+      }
+    } else if (data.user && data.user.email_confirmed_at) {
+      // User is already confirmed, create profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          full_name: userData.full_name,
+          role: 'donor',
+          phone: userData.phone || null,
+          city: userData.city || null,
+          blood_group: userData.blood_group as any || null,
+        });
+
+      if (profileError && profileError.code !== '23505') { // Ignore duplicate key errors
+        console.error('Profile creation error:', profileError);
+      }
     }
 
     return data;
@@ -69,12 +87,23 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
   
   if (!user) return null;
 
-  // Fetch user profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  // Fetch user profile with error handling
+  let profile = null;
+  try {
+    const { data: profileData, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error fetching profile:', error);
+    } else {
+      profile = profileData;
+    }
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+  }
 
   return {
     ...user,

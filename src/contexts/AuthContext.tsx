@@ -29,10 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentUser = await getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      // Only log non-policy errors to avoid spam
-      if (error && (error as any).code !== '42P17') {
-        console.error('Error fetching user:', error);
-      }
+      console.error('Error refreshing user:', error);
       setUser(null);
     }
   };
@@ -40,19 +37,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const getInitialSession = async () => {
       try {
+        setLoading(true);
         const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (error) {
           console.warn('Session error:', error);
           clearAuthData();
           setUser(null);
-          setLoading(false);
           return;
         }
-        await refreshUser();
-        setLoading(false);
+        
+        if (session?.user) {
+          await refreshUser();
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         console.error('Error getting initial session:', error);
         setUser(null);
+      } finally {
         setLoading(false);
       }
     };
@@ -61,10 +64,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+      console.log('Auth state change:', event, session?.user?.id);
+      
+      if (event === 'SIGNED_IN' && session?.user) {
         await refreshUser();
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        await refreshUser();
+      } else if (event === 'TOKEN_REFRESHED' && !session) {
+        setUser(null);
       }
-      setLoading(false);
+      
+      if (loading) {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();

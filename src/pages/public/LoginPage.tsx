@@ -17,7 +17,11 @@ export const LoginPage: React.FC = () => {
     try {
       await signIn(data.email, data.password);
       showToast('Successfully signed in!', 'success');
-      navigate(from, { replace: true });
+      
+      // Small delay to ensure auth state is updated
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 100);
     } catch (error: any) {
       console.error('Error signing in:', error);
       showToast(error.message || 'Failed to sign in', 'error');

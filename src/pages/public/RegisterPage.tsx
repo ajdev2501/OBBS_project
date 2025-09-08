@@ -13,10 +13,19 @@ export const RegisterPage: React.FC = () => {
     setLoading(true);
     try {
       const { email, password, ...userData } = data;
-      await signUp(email, password, userData);
+      const result = await signUp(email, password, userData);
       
-      showToast('Account created successfully! Please check your email.', 'success');
-      navigate('/donor');
+      if (result.user) {
+        showToast('Account created successfully!', 'success');
+        
+        // Small delay to ensure auth state is updated
+        setTimeout(() => {
+          navigate('/donor');
+        }, 100);
+      } else {
+        showToast('Please check your email to confirm your account.', 'warning');
+        navigate('/login');
+      }
     } catch (error: any) {
       console.error('Error registering:', error);
       showToast(error.message || 'Failed to create account', 'error');
