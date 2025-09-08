@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { HeartIcon, UserGroupIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline';
 import { Button } from '../../components/ui/Button';
 import { SearchForm } from '../../components/forms/SearchForm';
 import { NoticesList } from '../../components/data-display/NoticesList';
 import { getActiveNotices } from '../../lib/api/notices';
 import { getAvailability } from '../../lib/api/inventory';
+import { useAuth } from '../../contexts/AuthContext';
 import type { Notice } from '../../types/database';
 
 export const HomePage: React.FC = () => {
   const [notices, setNotices] = useState<(Notice & { created_by_profile: { full_name: string } })[]>([]);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const { role } = useAuth();
+
+  // Redirect authenticated users to their respective dashboards
+  if (role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+  
+  if (role === 'donor') {
+    return <Navigate to="/donor" replace />;
+  }
 
   useEffect(() => {
     loadNotices();

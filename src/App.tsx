@@ -16,10 +16,13 @@ import { RegisterPage } from './pages/public/RegisterPage';
 // Donor Pages
 import { DonorHome } from './pages/donor/DonorHome';
 import { DonorProfile } from './pages/donor/DonorProfile';
+import { ScheduleDonation } from './pages/donor/ScheduleDonation';
+import { DonorHistory } from './pages/donor/DonorHistory';
 
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminInventory } from './pages/admin/AdminInventory';
+import { ScheduleConfirmation } from './pages/admin/ScheduleConfirmation';
 
 function AppContent() {
   const { toast, hideToast } = useToast();
@@ -49,6 +52,20 @@ function AppContent() {
             </RoleGuard>
           </AuthGuard>
         } />
+        <Route path="/donor/schedule" element={
+          <AuthGuard>
+            <RoleGuard allowedRoles={['donor']}>
+              <Layout><ScheduleDonation /></Layout>
+            </RoleGuard>
+          </AuthGuard>
+        } />
+        <Route path="/donor/history" element={
+          <AuthGuard>
+            <RoleGuard allowedRoles={['donor']}>
+              <Layout><DonorHistory /></Layout>
+            </RoleGuard>
+          </AuthGuard>
+        } />
 
         {/* Admin Routes */}
         <Route path="/admin" element={
@@ -62,6 +79,13 @@ function AppContent() {
           <AuthGuard>
             <RoleGuard allowedRoles={['admin']}>
               <Layout><AdminInventory /></Layout>
+            </RoleGuard>
+          </AuthGuard>
+        } />
+        <Route path="/admin/schedule" element={
+          <AuthGuard>
+            <RoleGuard allowedRoles={['admin']}>
+              <Layout><ScheduleConfirmation /></Layout>
             </RoleGuard>
           </AuthGuard>
         } />

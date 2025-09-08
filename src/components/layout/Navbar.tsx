@@ -48,6 +48,12 @@ export const Navbar: React.FC = () => {
                 <Link to="/donor/profile" className="text-gray-700 hover:text-red-600 transition-colors">
                   Profile
                 </Link>
+                <Link to="/donor/schedule" className="text-gray-700 hover:text-red-600 transition-colors">
+                  Schedule
+                </Link>
+                <Link to="/donor/history" className="text-gray-700 hover:text-red-600 transition-colors">
+                  History
+                </Link>
               </>
             )}
 
@@ -58,6 +64,9 @@ export const Navbar: React.FC = () => {
                 </Link>
                 <Link to="/admin/inventory" className="text-gray-700 hover:text-red-600 transition-colors">
                   Inventory
+                </Link>
+                <Link to="/admin/schedule" className="text-gray-700 hover:text-red-600 transition-colors">
+                  Schedule
                 </Link>
               </>
             )}
