@@ -51,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await refreshUser();
       setLoading(false);
     };
+    )
 
     getInitialSession();
 
@@ -67,6 +68,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
         clearAuthData();
       }
+    }
+    )
+  }
+  )
 
   const role = getUserRole(user);
 
