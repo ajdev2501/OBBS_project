@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCurrentUser, getUserRole } from '../lib/auth';
 import type { AuthUser } from '../lib/auth';
-import { supabase, clearAuthData } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -35,55 +35,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const getInitialSession = async () => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
       try {
-        setLoading(true);
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (error) {
-          console.warn('Session error:', error);
-          clearAuthData();
-          setUser(null);
-          return;
-        }
-        
-        if (session?.user) {
+        if (session?.user && mounted) {
           await refreshUser();
-        } else {
+        } else if (mounted) {
           setUser(null);
         }
       } catch (error) {
-        console.error('Error getting initial session:', error);
-        setUser(null);
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    getInitialSession();
+    initializeAuth();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.id);
+      if (!mounted) return;
+
+      console.log('Auth state change:', event);
       
       if (event === 'SIGNED_IN' && session?.user) {
         await refreshUser();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
-      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        await refreshUser();
-      } else if (event === 'TOKEN_REFRESHED' && !session) {
-        setUser(null);
       }
       
-      if (loading) {
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }
-  )
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const role = getUserRole(user);
 

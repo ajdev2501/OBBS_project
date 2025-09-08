@@ -15,15 +15,14 @@ export const LoginPage: React.FC = () => {
   const handleSubmit = async (data: { email: string; password: string }) => {
     setLoading(true);
     try {
-      await signIn(data.email, data.password);
-      showToast('Successfully signed in!', 'success');
+      const result = await signIn(data.email, data.password);
       
-      // Small delay to ensure auth state is updated
-      setTimeout(() => {
+      if (result.user) {
+        showToast('Successfully signed in!', 'success');
         navigate(from, { replace: true });
-      }, 100);
+      }
     } catch (error: any) {
-      console.error('Error signing in:', error);
+      console.error('Login error:', error);
       showToast(error.message || 'Failed to sign in', 'error');
     } finally {
       setLoading(false);
