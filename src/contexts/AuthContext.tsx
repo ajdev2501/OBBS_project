@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCurrentUser, getUserRole } from '../lib/auth';
 import type { AuthUser } from '../lib/auth';
-import { supabase } from '../lib/supabase';
+import { supabase, clearAuthData } from '../lib/supabase';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -39,7 +39,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Get initial session
-    const getInitialSession = async () => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.warn('Session error:', error);
+        clearAuthData();
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
       await refreshUser();
       setLoading(false);
     };
@@ -55,7 +63,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+        clearAuthData();
+      }
 
   const role = getUserRole(user);
 
