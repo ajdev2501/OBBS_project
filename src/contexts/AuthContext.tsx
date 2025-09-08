@@ -38,20 +38,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.warn('Session error:', error);
-        clearAuthData();
-        setUser(null);
-        setProfile(null);
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.warn('Session error:', error);
+          clearAuthData();
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        await refreshUser();
         setLoading(false);
-        return;
+      } catch (error) {
+        console.error('Error getting initial session:', error);
+        setUser(null);
+        setLoading(false);
       }
-      await refreshUser();
-      setLoading(false);
     };
-    )
 
     getInitialSession();
 
@@ -64,14 +68,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => subscription.unsubscribe();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
-        clearAuthData();
-      }
-    }
-    )
-  }
-  )
 
   const role = getUserRole(user);
 
