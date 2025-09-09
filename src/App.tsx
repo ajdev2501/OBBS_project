@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Layout } from './components/layout/Layout';
 import { AuthGuard } from './components/layout/AuthGuard';
 import { RoleGuard } from './components/layout/RoleGuard';
 import { Toast, useToast } from './components/ui/Toast';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
 // Public Pages
 import { HomePage } from './pages/public/HomePage';
@@ -26,6 +27,16 @@ import { ScheduleConfirmation } from './pages/admin/ScheduleConfirmation';
 
 function AppContent() {
   const { toast, hideToast } = useToast();
+  const { initialized } = useAuth();
+
+  // Show loading spinner until auth is initialized to prevent route flashing
+  if (!initialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <>

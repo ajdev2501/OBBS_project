@@ -34,6 +34,8 @@ export const Button: React.FC<ButtonProps> = ({
 
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
 
+  console.log('[Button] Rendering with loading:', loading, 'disabled:', disabled || loading);
+
   return (
     <button
       className={classes}

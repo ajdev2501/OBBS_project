@@ -13,20 +13,7 @@ export const HomePage: React.FC = () => {
   const [notices, setNotices] = useState<(Notice & { created_by_profile: { full_name: string } })[]>([]);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const { role } = useAuth();
-
-  // Redirect authenticated users to their respective dashboards
-  if (role === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-  
-  if (role === 'donor') {
-    return <Navigate to="/donor" replace />;
-  }
-
-  useEffect(() => {
-    loadNotices();
-  }, []);
+  const { role, user, loading: authLoading } = useAuth();
 
   const loadNotices = async () => {
     try {
@@ -48,6 +35,31 @@ export const HomePage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Only load notices if we're staying on this page (public user)
+    if (!user || role === 'public') {
+      loadNotices();
+    }
+  }, [user, role]);
+
+  // Wait for auth to complete before redirecting to prevent hooks error
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+      </div>
+    );
+  }
+
+  // Redirect authenticated users to their respective dashboards
+  if (user && role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+  
+  if (user && role === 'donor') {
+    return <Navigate to="/donor" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

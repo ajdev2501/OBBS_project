@@ -20,8 +20,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, loading = false 
     resolver: zodResolver(LoginSchema),
   });
 
+  const handleFormSubmit = (data: LoginFormData) => {
+    console.log('[LoginForm] Form submitted with data:', { email: data.email, passwordLength: data.password.length });
+    console.log('[LoginForm] Calling onSubmit prop...');
+    onSubmit(data);
+  };
+
+  console.log('[LoginForm] Rendering with loading:', loading);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <Input
         label="Email Address"
         type="email"

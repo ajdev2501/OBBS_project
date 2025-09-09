@@ -15,6 +15,8 @@ export const LoginPage: React.FC = () => {
 
   // Redirect if already logged in
   useEffect(() => {
+    console.log('[LoginPage] Auth state:', { user: !!user, role, authLoading });
+    
     if (!authLoading && user) {
       let redirectPath = from || '/';
       if (role === 'admin') {
@@ -22,19 +24,22 @@ export const LoginPage: React.FC = () => {
       } else if (role === 'donor') {
         redirectPath = '/donor';
       }
+      
+      console.log('[LoginPage] Redirecting to:', redirectPath);
       navigate(redirectPath, { replace: true });
     }
   }, [user, role, authLoading, navigate, from]);
 
   const handleSubmit = async (data: { email: string; password: string }) => {
+    console.log('[LoginPage] Attempting login for:', data.email);
     setLoading(true);
+    
     try {
       await signIn(data.email, data.password);
+      console.log('[LoginPage] Login successful');
       showToast('Successfully signed in!', 'success');
-      // Don't navigate here - let the auth context handle it
-      // The useEffect above will handle the redirect
     } catch (error: unknown) {
-      console.error('Login error:', error);
+      console.error('[LoginPage] Login error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
       showToast(errorMessage, 'error');
     } finally {
