@@ -137,26 +137,3 @@ export const authOperations = {
     }
   }
 };
-
-// Utility functions for compatibility
-export const getRoleBasedRedirectPath = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-      return '/admin';
-    case 'donor':
-      return '/donor';
-    default:
-      return '/';
-  }
-};
-
-export const checkDonorEligibility = (lastDonationDate: string | null): boolean => {
-  if (!lastDonationDate) return true;
-  
-  const lastDonation = new Date(lastDonationDate);
-  const now = new Date();
-  const daysDifference = Math.floor((now.getTime() - lastDonation.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Donors must wait 90 days between donations
-  return daysDifference >= 90;
-};

@@ -1,33 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LoginForm } from '../../components/forms/LoginForm';
-import { signIn } from '../../lib/auth';
 import { useToast } from '../../components/ui/Toast';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
+  const { user, role, loading: authLoading, signIn } = useAuth();
 
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      let redirectPath = from || '/';
+      if (role === 'admin') {
+        redirectPath = '/admin';
+      } else if (role === 'donor') {
+        redirectPath = '/donor';
+      }
+      navigate(redirectPath, { replace: true });
+    }
+  }, [user, role, authLoading, navigate, from]);
 
   const handleSubmit = async (data: { email: string; password: string }) => {
     setLoading(true);
     try {
-      const result = await signIn(data.email, data.password);
-      
-      if (result.user) {
-        showToast('Successfully signed in!', 'success');
-        navigate(from, { replace: true });
-      }
-    } catch (error: any) {
+      await signIn(data.email, data.password);
+      showToast('Successfully signed in!', 'success');
+      // Don't navigate here - let the auth context handle it
+      // The useEffect above will handle the redirect
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      showToast(error.message || 'Failed to sign in', 'error');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
+      showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
   };
+
+  // Show loading while checking auth state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

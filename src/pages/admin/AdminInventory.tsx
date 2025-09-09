@@ -1,25 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { InventoryForm } from '../../components/forms/InventoryForm';
 import { InventoryTable } from '../../components/data-display/InventoryTable';
 import { useToast } from '../../components/ui/Toast';
+import { useAuth } from '../../contexts/AuthContext';
 import { getInventoryItems, createInventoryItem, updateInventoryItem, deleteInventoryItem } from '../../lib/api/inventory';
-import type { InventoryItem } from '../../types/database';
+import type { InventoryItem, BloodGroup } from '../../types/database';
 
 export function AdminInventory() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [inventory, setInventory] = useState<(InventoryItem & { created_by_profile: { full_name: string } })[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const { showToast } = useToast();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    loadInventory();
-  }, []);
-
-  const loadInventory = async () => {
+  const loadInventory = useCallback(async () => {
     try {
       const data = await getInventoryItems(true);
       setInventory(data);
@@ -28,13 +26,26 @@ export function AdminInventory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
 
-  const handleCreateItem = async (data: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>) => {
+  useEffect(() => {
+    loadInventory();
+  }, [loadInventory]);
+
+  const handleCreateItem = async (formData: { blood_group: string; bag_id: string; volume_ml: number; storage_location: string; collected_on: string; expires_on: string }) => {
+    if (!user) return;
+    
     try {
       setLoading(true);
-      const newItem = await createInventoryItem(data);
-      setInventory(prev => [...prev, newItem]);
+      const data = {
+        ...formData,
+        blood_group: formData.blood_group as BloodGroup, // Type assertion since form validates the blood group
+        status: 'available' as const,
+        created_by: user.id
+      };
+      await createInventoryItem(data);
+      // Reload inventory to get the proper structure with created_by_profile
+      await loadInventory();
       setModalOpen(false);
       showToast('Blood unit added successfully', 'success');
     } catch (error) {
@@ -44,15 +55,18 @@ export function AdminInventory() {
     }
   };
 
-  const handleUpdateItem = async (data: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>) => {
+  const handleUpdateItem = async (formData: { blood_group: string; bag_id: string; volume_ml: number; storage_location: string; collected_on: string; expires_on: string }) => {
     if (!editingItem) return;
     
     try {
       setLoading(true);
-      const updatedItem = await updateInventoryItem(editingItem.id, data);
-      setInventory(prev => prev.map(item => 
-        item.id === editingItem.id ? updatedItem : item
-      ));
+      const updates = {
+        ...formData,
+        blood_group: formData.blood_group as BloodGroup // Type assertion since form validates the blood group
+      };
+      await updateInventoryItem(editingItem.id, updates);
+      // Reload inventory to get the updated data
+      await loadInventory();
       setModalOpen(false);
       setEditingItem(null);
       showToast('Blood unit updated successfully', 'success');
@@ -94,10 +108,11 @@ export function AdminInventory() {
       </div>
 
       <InventoryTable
-        inventory={inventory}
+        items={inventory}
         loading={loading}
         onEdit={handleEditItem}
         onDelete={handleDeleteItem}
+        isAdmin={true}
       />
 
       <Modal

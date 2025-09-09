@@ -1,13 +1,25 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { HeartIcon, UserIcon, CogIcon } from '@heroicons/react/24/outline';
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  HeartIcon, 
+  UserIcon, 
+  MagnifyingGlassIcon,
+  ChartBarIcon,
+  ClipboardDocumentListIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  Bars3Icon,
+  XMarkIcon
+} from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
-import { signOut } from '../../lib/auth';
 import { Button } from '../ui/Button';
 
 export const Navbar: React.FC = () => {
-  const { user, role } = useAuth();
+  const { user, role, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -17,6 +29,26 @@ export const Navbar: React.FC = () => {
       console.error('Error signing out:', error);
     }
   };
+
+  const isActiveRoute = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
+  const adminMenuItems = [
+    { path: '/admin', label: 'Admin Dashboard', icon: ChartBarIcon },
+    { path: '/admin/inventory', label: 'Inventory Management', icon: ClipboardDocumentListIcon },
+    { path: '/admin/schedule', label: 'Donation Confirmation', icon: CalendarDaysIcon },
+    { path: '/search', label: 'Search Pages', icon: MagnifyingGlassIcon },
+  ];
+
+  const donorMenuItems = [
+    { path: '/donor', label: 'Donor Home', icon: HeartIcon },
+    { path: '/donor/schedule', label: 'Schedule Donation', icon: CalendarDaysIcon },
+    { path: '/donor/history', label: 'Donor History', icon: ClockIcon },
+    { path: '/request', label: 'Request Blood', icon: DocumentTextIcon },
+    { path: '/search', label: 'Search Pages', icon: MagnifyingGlassIcon },
+    { path: '/donor/profile', label: 'Donor Profile', icon: UserIcon },
+  ];
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -28,61 +60,117 @@ export const Navbar: React.FC = () => {
             <span className="text-xl font-bold text-gray-900">BloodBank</span>
           </Link>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-red-600 transition-colors">
-              Home
-            </Link>
-            <Link to="/search" className="text-gray-700 hover:text-red-600 transition-colors">
-              Search Blood
-            </Link>
-            <Link to="/request" className="text-gray-700 hover:text-red-600 transition-colors">
-              Request Blood
-            </Link>
-
-            {role === 'donor' && (
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center space-x-1">
+            {/* Public Links for unauthenticated users */}
+            {role === 'public' && (
               <>
-                <Link to="/donor" className="text-gray-700 hover:text-red-600 transition-colors">
-                  Dashboard
+                <Link 
+                  to="/" 
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActiveRoute('/') && location.pathname === '/' 
+                      ? 'bg-red-100 text-red-700' 
+                      : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                  }`}
+                >
+                  Home
                 </Link>
-                <Link to="/donor/profile" className="text-gray-700 hover:text-red-600 transition-colors">
-                  Profile
+                <Link 
+                  to="/search" 
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActiveRoute('/search') 
+                      ? 'bg-red-100 text-red-700' 
+                      : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                  }`}
+                >
+                  Search Blood
                 </Link>
-                <Link to="/donor/schedule" className="text-gray-700 hover:text-red-600 transition-colors">
-                  Schedule
-                </Link>
-                <Link to="/donor/history" className="text-gray-700 hover:text-red-600 transition-colors">
-                  History
+                <Link 
+                  to="/request" 
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActiveRoute('/request') 
+                      ? 'bg-red-100 text-red-700' 
+                      : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                  }`}
+                >
+                  Request Blood
                 </Link>
               </>
             )}
 
-            {role === 'admin' && (
-              <>
-                <Link to="/admin" className="text-gray-700 hover:text-red-600 transition-colors">
-                  Admin Panel
+            {/* Admin Navigation */}
+            {role === 'admin' && adminMenuItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActiveRoute(item.path)
+                      ? 'bg-red-100 text-red-700'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{item.label}</span>
                 </Link>
-                <Link to="/admin/inventory" className="text-gray-700 hover:text-red-600 transition-colors">
-                  Inventory
+              );
+            })}
+
+            {/* Donor Navigation */}
+            {role === 'donor' && donorMenuItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActiveRoute(item.path)
+                      ? 'bg-red-100 text-red-700'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{item.label}</span>
                 </Link>
-                <Link to="/admin/schedule" className="text-gray-700 hover:text-red-600 transition-colors">
-                  Schedule
-                </Link>
-              </>
-            )}
+              );
+            })}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+            >
+              {mobileMenuOpen ? (
+                <XMarkIcon className="w-6 h-6" />
+              ) : (
+                <Bars3Icon className="w-6 h-6" />
+              )}
+            </button>
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
-                <div className="hidden sm:block">
-                  <span className="text-sm text-gray-700">
+                <div className="text-right">
+                  <div className="text-sm font-medium text-gray-900">
                     {user.profile?.full_name || user.email}
-                  </span>
-                  <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                    {role}
-                  </span>
+                  </div>
+                  <div className="flex items-center justify-end space-x-1">
+                    <span className="text-xs text-gray-500">Role:</span>
+                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                      role === 'admin' 
+                        ? 'bg-purple-100 text-purple-800' 
+                        : role === 'donor'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {role === 'admin' ? 'Administrator' : role === 'donor' ? 'Donor' : 'Public'}
+                    </span>
+                  </div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   Sign Out
@@ -104,6 +192,118 @@ export const Navbar: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200">
+              {/* Public Links for mobile */}
+              {role === 'public' && (
+                <>
+                  <Link 
+                    to="/" 
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    to="/search" 
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Search Blood
+                  </Link>
+                  <Link 
+                    to="/request" 
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Request Blood
+                  </Link>
+                </>
+              )}
+
+              {/* Admin Links for mobile */}
+              {role === 'admin' && adminMenuItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+
+              {/* Donor Links for mobile */}
+              {role === 'donor' && donorMenuItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+
+              {/* User actions for mobile */}
+              {user ? (
+                <div className="border-t border-gray-200 pt-3 mt-3">
+                  <div className="px-3 py-2">
+                    <div className="text-base font-medium text-gray-900">
+                      {user.profile?.full_name || user.email}
+                    </div>
+                    <div className="flex items-center space-x-1 mt-1">
+                      <span className="text-sm text-gray-500">Role:</span>
+                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                        role === 'admin' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : role === 'donor'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {role === 'admin' ? 'Administrator' : role === 'donor' ? 'Donor' : 'Public'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
+                  <Link 
+                    to="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/register"
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-red-600 text-white hover:bg-red-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

@@ -9,17 +9,27 @@ interface RoleGuardProps {
 }
 
 export const RoleGuard: React.FC<RoleGuardProps> = ({ children, allowedRoles }) => {
-  const { role, loading } = useAuth();
+  const { role, loading, user, initialized } = useAuth();
 
-  if (loading) {
+  // Show loading while initializing
+  if (!initialized || loading) {
     return <LoadingPage />;
   }
 
+  // If user doesn't have profile, they might need to complete registration
+  if (user && !user.profile) {
+    return <Navigate to="/register" replace />;
+  }
+
   if (!allowedRoles.includes(role)) {
-    // Redirect based on role
-    if (role === 'admin') return <Navigate to="/admin" replace />;
-    if (role === 'donor') return <Navigate to="/donor" replace />;
-    return <Navigate to="/" replace />;
+    // Redirect to appropriate page based on user's role
+    let redirectPath = '/';
+    if (role === 'admin') {
+      redirectPath = '/admin';
+    } else if (role === 'donor') {
+      redirectPath = '/donor';
+    }
+    return <Navigate to={redirectPath} replace />;
   }
 
   return <>{children}</>;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Button } from '../ui/Button';
+import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { getExpiryPriority } from '../../lib/fefo';
 import type { InventoryItem } from '../../types/database';
 
@@ -10,13 +11,15 @@ interface InventoryTableProps {
   onEdit?: (item: InventoryItem) => void;
   onDelete?: (id: string) => void;
   isAdmin?: boolean;
+  loading?: boolean;
 }
 
 export const InventoryTable: React.FC<InventoryTableProps> = ({
-  items,
+  items = [],
   onEdit,
   onDelete,
-  isAdmin = false
+  isAdmin = false,
+  loading = false
 }) => {
   const [sortField, setSortField] = useState<keyof InventoryItem>('expires_on');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -96,6 +99,13 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
         </div>
       </div>
 
+      {loading ? (
+        <div className="p-8 text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-2 text-gray-500">Loading inventory...</p>
+        </div>
+      ) : (
+        <>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -199,6 +209,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
         <div className="p-8 text-center text-gray-500">
           No inventory items found.
         </div>
+      )}
+        </>
       )}
     </div>
   );
