@@ -3,16 +3,16 @@ import { HeartIcon } from '@heroicons/react/24/outline';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-gray-50 border-t border-gray-200 mt-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Brand */}
           <div className="col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
+            <div className="flex items-center space-x-2 mb-3">
               <HeartIcon className="w-8 h-8 text-red-600" />
               <span className="text-xl font-bold text-gray-900">BloodBank</span>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 text-sm leading-relaxed">
               Connecting blood donors with those in need. Saving lives through efficient blood bank management.
             </p>
           </div>
@@ -48,7 +48,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-8 pt-8 text-center">
+        <div className="border-t border-gray-200 mt-6 pt-6 text-center">
           <p className="text-sm text-gray-500">
             © 2025 BloodBank Management System. All rights reserved.
           </p>

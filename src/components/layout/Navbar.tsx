@@ -51,23 +51,23 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
             <HeartIcon className="w-8 h-8 text-red-600" />
             <span className="text-xl font-bold text-gray-900">BloodBank</span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
             {/* Public Links for unauthenticated users */}
             {role === 'public' && (
               <>
                 <Link 
                   to="/" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActiveRoute('/') && location.pathname === '/' 
                       ? 'bg-red-100 text-red-700' 
                       : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
@@ -77,7 +77,7 @@ export const Navbar: React.FC = () => {
                 </Link>
                 <Link 
                   to="/search" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActiveRoute('/search') 
                       ? 'bg-red-100 text-red-700' 
                       : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
@@ -87,7 +87,7 @@ export const Navbar: React.FC = () => {
                 </Link>
                 <Link 
                   to="/request" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActiveRoute('/request') 
                       ? 'bg-red-100 text-red-700' 
                       : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
@@ -105,7 +105,7 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActiveRoute(item.path)
                       ? 'bg-red-100 text-red-700'
                       : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
@@ -124,7 +124,7 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActiveRoute(item.path)
                       ? 'bg-red-100 text-red-700'
                       : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
@@ -137,8 +137,35 @@ export const Navbar: React.FC = () => {
             })}
           </div>
 
+          {/* User Menu */}
+          <div className="flex items-center space-x-4 flex-shrink-0">
+            {user ? (
+              <>
+                <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-700">
+                  <UserIcon className="w-4 h-4" />
+                  <span>{user.email}</span>
+                  <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                    {role === 'admin' ? 'Administrator' : 'Donor'}
+                  </span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">Sign In</Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="primary" size="sm">Register</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+
           {/* Mobile menu button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden ml-2">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
@@ -149,47 +176,6 @@ export const Navbar: React.FC = () => {
                 <Bars3Icon className="w-6 h-6" />
               )}
             </button>
-          </div>
-
-          {/* User Actions */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {user ? (
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-900">
-                    {user.profile?.full_name || user.email}
-                  </div>
-                  <div className="flex items-center justify-end space-x-1">
-                    <span className="text-xs text-gray-500">Role:</span>
-                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                      role === 'admin' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : role === 'donor'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {role === 'admin' ? 'Administrator' : role === 'donor' ? 'Donor' : 'Public'}
-                    </span>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Link to="/login">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button variant="primary" size="sm">
-                    Register
-                  </Button>
-                </Link>
-              </div>
-            )}
           </div>
         </div>
 

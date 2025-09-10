@@ -13,7 +13,7 @@ export const HomePage: React.FC = () => {
   const [notices, setNotices] = useState<(Notice & { created_by_profile: { full_name: string } })[]>([]);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const { role, user, loading: authLoading } = useAuth();
+  const { role, user, loading: authLoading, profileLoaded } = useAuth();
 
   const loadNotices = async () => {
     try {
@@ -44,7 +44,7 @@ export const HomePage: React.FC = () => {
   }, [user, role]);
 
   // Wait for auth to complete before redirecting to prevent hooks error
-  if (authLoading) {
+  if (authLoading || (user && !profileLoaded)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>

@@ -9,10 +9,10 @@ interface RoleGuardProps {
 }
 
 export const RoleGuard: React.FC<RoleGuardProps> = ({ children, allowedRoles }) => {
-  const { role, loading, user, initialized } = useAuth();
+  const { role, loading, user, initialized, profileLoaded } = useAuth();
 
-  // Show loading while initializing
-  if (!initialized || loading) {
+  // Show loading while initializing or loading profile
+  if (!initialized || loading || (user && !profileLoaded)) {
     return <LoadingPage />;
   }
 

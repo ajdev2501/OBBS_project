@@ -11,27 +11,43 @@ export const useRealTimeUpdates = <T>(
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    console.log(`[useRealTimeUpdates] Setting up for table: ${table}`);
+    
     const fetchData = async () => {
       try {
         setLoading(true);
-        let query = supabase.from(table).select(`
-          *,
-          ${table === 'inventory' ? 'created_by_profile:profiles!created_by(full_name)' : ''}
-          ${table === 'notices' ? 'created_by_profile:profiles!created_by(full_name)' : ''}
-        `.trim());
+        console.log(`[useRealTimeUpdates] Fetching data for table: ${table}`);
+        
+        let query = supabase.from(table).select('*');
+
+        // Add specific joins only for certain tables
+        if (table === 'notices') {
+          query = supabase.from(table).select(`
+            *,
+            created_by_profile:profiles!created_by(full_name)
+          `);
+        }
         
         if (filter) {
           query = query.eq(filter.column, filter.value);
+          console.log(`[useRealTimeUpdates] Applied filter: ${filter.column} = ${filter.value}`);
         }
 
         const { data: initialData, error: fetchError } = await query;
         
-        if (fetchError) throw fetchError;
+        if (fetchError) {
+          console.error(`[useRealTimeUpdates] Error fetching ${table}:`, fetchError);
+          throw fetchError;
+        }
         
+        console.log(`[useRealTimeUpdates] Successfully fetched ${initialData?.length || 0} records from ${table}`);
         setData(initialData || []);
         setError(null);
       } catch (err) {
+        console.error(`[useRealTimeUpdates] Error for ${table}:`, err);
         setError(err as Error);
+        // Set empty array on error to prevent undefined issues
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -51,6 +67,8 @@ export const useRealTimeUpdates = <T>(
           filter: filter ? `${filter.column}=eq.${filter.value}` : undefined,
         },
         (payload) => {
+          console.log(`[useRealTimeUpdates] Real-time event for ${table}:`, payload.eventType, payload);
+          
           if (payload.eventType === 'INSERT') {
             setData(prev => [...prev, payload.new as T]);
           } else if (payload.eventType === 'UPDATE') {
@@ -62,16 +80,49 @@ export const useRealTimeUpdates = <T>(
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`[useRealTimeUpdates] Subscription status for ${table}:`, status);
+      });
 
     return () => {
+      console.log(`[useRealTimeUpdates] Cleaning up subscription for ${table}`);
       supabase.removeChannel(channel);
     };
   }, [table, JSON.stringify(filter), ...dependencies]);
 
-  const refetch = () => {
-    setLoading(true);
-    setError(null);
+  const refetch = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      let query = supabase.from(table).select('*');
+
+      // Add specific joins only for certain tables
+      if (table === 'notices') {
+        query = supabase.from(table).select(`
+          *,
+          created_by_profile:profiles!created_by(full_name)
+        `);
+      }
+      
+      if (filter) {
+        query = query.eq(filter.column, filter.value);
+      }
+
+      const { data: newData, error: fetchError } = await query;
+      
+      if (fetchError) {
+        console.error(`Error refetching ${table}:`, fetchError);
+        throw fetchError;
+      }
+      
+      setData(newData || []);
+    } catch (err) {
+      console.error(`useRealTimeUpdates refetch error for ${table}:`, err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return { data, loading, error, refetch };

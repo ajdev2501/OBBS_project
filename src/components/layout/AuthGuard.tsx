@@ -8,7 +8,7 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { user, loading, initialized } = useAuth();
+  const { user, loading, initialized, profileLoaded } = useAuth();
   const location = useLocation();
 
   console.log('[AuthGuard] Current state:', { 
@@ -16,6 +16,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     userEmail: user?.email,
     loading, 
     initialized,
+    profileLoaded,
     pathname: location.pathname
   });
 
@@ -25,9 +26,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <LoadingPage />;
   }
 
-  // Show loading during auth operations
-  if (loading) {
-    console.log('[AuthGuard] Loading, showing loading page...');
+  // Show loading during auth operations or profile loading
+  if (loading || (user && !profileLoaded)) {
+    console.log('[AuthGuard] Loading auth or profile, showing loading page...');
     return <LoadingPage />;
   }
 

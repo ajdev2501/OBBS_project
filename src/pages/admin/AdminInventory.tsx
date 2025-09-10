@@ -98,22 +98,24 @@ export function AdminInventory() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Blood Inventory Management</h1>
-        <Button onClick={() => setModalOpen(true)} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Add Blood Unit
-        </Button>
-      </div>
+    <div className="w-full">
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Blood Inventory Management</h1>
+          <Button onClick={() => setModalOpen(true)} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Add Blood Unit
+          </Button>
+        </div>
 
-      <InventoryTable
-        items={inventory}
-        loading={loading}
-        onEdit={handleEditItem}
-        onDelete={handleDeleteItem}
-        isAdmin={true}
-      />
+        <InventoryTable
+          items={inventory}
+          loading={loading}
+          onEdit={handleEditItem}
+          onDelete={handleDeleteItem}
+          isAdmin={true}
+        />
+      </div>
 
       <Modal
         isOpen={modalOpen}

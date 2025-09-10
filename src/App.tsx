@@ -1,9 +1,9 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Layout } from './components/layout/Layout';
 import { AuthGuard } from './components/layout/AuthGuard';
 import { RoleGuard } from './components/layout/RoleGuard';
+import { AdminGuard } from './components/layout/AdminGuard';
 import { Toast, useToast } from './components/ui/Toast';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
@@ -27,10 +27,10 @@ import { ScheduleConfirmation } from './pages/admin/ScheduleConfirmation';
 
 function AppContent() {
   const { toast, hideToast } = useToast();
-  const { initialized } = useAuth();
+  const { initialized, loading } = useAuth();
 
-  // Show loading spinner until auth is initialized to prevent route flashing
-  if (!initialized) {
+  // Show loading spinner until auth is initialized and not loading to prevent route flashing
+  if (!initialized || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -80,25 +80,19 @@ function AppContent() {
 
         {/* Admin Routes */}
         <Route path="/admin" element={
-          <AuthGuard>
-            <RoleGuard allowedRoles={['admin']}>
-              <Layout><AdminDashboard /></Layout>
-            </RoleGuard>
-          </AuthGuard>
+          <AdminGuard>
+            <Layout><AdminDashboard /></Layout>
+          </AdminGuard>
         } />
         <Route path="/admin/inventory" element={
-          <AuthGuard>
-            <RoleGuard allowedRoles={['admin']}>
-              <Layout><AdminInventory /></Layout>
-            </RoleGuard>
-          </AuthGuard>
+          <AdminGuard>
+            <Layout><AdminInventory /></Layout>
+          </AdminGuard>
         } />
         <Route path="/admin/schedule" element={
-          <AuthGuard>
-            <RoleGuard allowedRoles={['admin']}>
-              <Layout><ScheduleConfirmation /></Layout>
-            </RoleGuard>
-          </AuthGuard>
+          <AdminGuard>
+            <Layout><ScheduleConfirmation /></Layout>
+          </AdminGuard>
         } />
       </Routes>
 

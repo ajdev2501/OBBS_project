@@ -83,9 +83,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, setState] = useState<AuthState>({
     user: null,
     role: 'public',
-    loading: false,
+    loading: true, // Start with loading true
     initialized: false,
-    session: null
+    session: null,
+    profileLoaded: false
   });
 
   console.log('[AuthProvider] Current state:', {
@@ -122,7 +123,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               role: profile?.role === 'admin' ? 'admin' : 'donor',
               session,
               loading: false,
-              initialized: true
+              initialized: true,
+              profileLoaded: true
             });
           }
         } else {
@@ -133,7 +135,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               role: 'public',
               session: null,
               loading: false,
-              initialized: true
+              initialized: true,
+              profileLoaded: false
             });
           }
         }
@@ -145,7 +148,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             role: 'public',
             session: null,
             loading: false,
-            initialized: true
+            initialized: true,
+            profileLoaded: false
           });
         }
       }
@@ -161,12 +165,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Auth methods
   const signIn = useCallback(async (email: string, password: string) => {
     console.log('[Auth] signIn called with email:', email);
-    setState(prev => {
-      console.log('[Auth] Setting loading to true');
-      return { ...prev, loading: true };
-    });
-    
-    try {
+      setState(prev => {
+        console.log('[Auth] Setting loading to true');
+        return { ...prev, loading: true };
+      });    try {
       console.log('[Auth] Calling supabase.auth.signInWithPassword...');
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -283,7 +285,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role: 'donor' as UserRole, // Default role, will be updated after profile fetch
           session,
           loading: false, // Don't block on profile fetch
-          initialized: true
+          initialized: true,
+          profileLoaded: false
         };
         
         console.log('[Auth] Setting immediate auth state (profile will load in background)');
@@ -301,7 +304,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 ...prev.user,
                 profile
               } : prev.user,
-              role: (profile?.role === 'admin' ? 'admin' : 'donor') as UserRole
+              role: (profile?.role === 'admin' ? 'admin' : 'donor') as UserRole,
+              profileLoaded: true
             }));
           })
           .catch(error => {
@@ -315,7 +319,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role: 'public' as UserRole,
           session: null,
           loading: false,
-          initialized: true
+          initialized: true,
+          profileLoaded: false
         };
         
         console.log('[Auth] Setting signed out state');
