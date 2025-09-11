@@ -266,6 +266,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log('[Auth] Signup successful, user:', data.user?.email);
       
+      // Fallback: If user was created but profile creation might have missed date_of_birth,
+      // attempt to update the profile with the date_of_birth field
+      if (data.user && userData.date_of_birth) {
+        try {
+          console.log('[Auth] Ensuring date_of_birth is saved to profile...');
+          // Import the updateProfile function dynamically to avoid circular imports
+          const updateProfileWithDOB = async () => {
+            try {
+              const { updateProfile } = await import('../lib/api/profiles');
+              await updateProfile(data.user!.id, {
+                date_of_birth: userData.date_of_birth || null
+              });
+              console.log('[Auth] Successfully updated profile with date_of_birth');
+            } catch (err) {
+              console.error('[Auth] Exception updating profile with date_of_birth:', err);
+            }
+          };
+          
+          // Give a small delay to allow profile creation trigger to complete
+          setTimeout(updateProfileWithDOB, 1000); // 1 second delay
+        } catch (err) {
+          console.error('[Auth] Error in date_of_birth fallback update:', err);
+        }
+      }
+      
       // The profile will be created by the auth state change listener
       // which will handle both trigger-created and manual profile creation
       
@@ -361,6 +386,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 phone: session.user.user_metadata?.phone || null,
                 city: session.user.user_metadata?.city || null,
                 blood_group: session.user.user_metadata?.blood_group || null,
+                date_of_birth: session.user.user_metadata?.date_of_birth || null,
                 role: 'donor' as const
               };
               

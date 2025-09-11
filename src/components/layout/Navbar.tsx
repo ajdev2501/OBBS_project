@@ -13,7 +13,8 @@ import {
   XMarkIcon,
   BellIcon,
   ShieldCheckIcon,
-  CogIcon
+  CogIcon,
+  MegaphoneIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
@@ -107,6 +108,12 @@ export const Navbar = () => {
       label: 'Inventory', 
       icon: ClipboardDocumentListIcon,
       description: 'Blood Stock Management'
+    },
+    { 
+      path: '/admin/notices', 
+      label: 'Notices', 
+      icon: MegaphoneIcon,
+      description: 'System Announcements'
     },
     { 
       path: '/admin/schedule', 

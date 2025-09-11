@@ -100,6 +100,8 @@ export type InventoryStatus = 'available' | 'reserved' | 'fulfilled' | 'discarde
 export type RequestStatus = 'pending' | 'approved' | 'fulfilled' | 'rejected';
 export type Urgency = 'low' | 'medium' | 'high';
 export type AppointmentStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
+export type NoticePriority = 'low' | 'medium' | 'high' | 'urgent';
+export type NoticeCategory = 'general' | 'urgent' | 'donation_drive' | 'maintenance' | 'emergency';
 
 export interface Profile {
   id: string;
@@ -157,6 +159,8 @@ export interface Notice {
   city: string | null;
   blood_group: BloodGroup | null;
   active: boolean;
+  priority?: NoticePriority;
+  category?: NoticeCategory;
   created_by: string;
   created_at: string;
 }

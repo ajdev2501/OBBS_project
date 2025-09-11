@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAdminDashboard } from '../../hooks/useAdminDashboard';
 import type { BloodRequest } from '../../types/database';
@@ -44,6 +45,7 @@ import {
  */
 export function AdminDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'inventory' | 'requests' | 'notices'>('overview');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [viewingRequest, setViewingRequest] = useState<BloodRequest | null>(null);
@@ -354,12 +356,36 @@ export function AdminDashboard() {
           {/* Notices Tab */}
           {activeTab === 'notices' && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
-                All System Notices
-              </h3>
+              <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                  System Notices
+                </h3>
+                <Button
+                  onClick={() => navigate('/admin/notices')}
+                  className="flex items-center space-x-2"
+                  size="sm"
+                >
+                  <BellIcon className="w-4 h-4" />
+                  <span>Manage Notices</span>
+                </Button>
+              </div>
               <NoticesList 
                 notices={notices}
               />
+              {notices.length === 0 && (
+                <div className="text-center py-8">
+                  <BellIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No notices yet</h3>
+                  <p className="text-gray-500 mb-4">Create your first system notice to communicate with users</p>
+                  <Button
+                    onClick={() => navigate('/admin/notices')}
+                    className="flex items-center space-x-2"
+                  >
+                    <BellIcon className="w-4 h-4" />
+                    <span>Create Notice</span>
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

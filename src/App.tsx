@@ -24,6 +24,7 @@ import { DonorHistory } from './pages/donor/DonorHistory';
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminInventory } from './pages/admin/AdminInventory';
+import { NoticesManagement } from './pages/admin/NoticesManagement';
 import ScheduleConfirmation from './pages/admin/ScheduleConfirmation';
 
 function AppContent() {
@@ -89,6 +90,11 @@ function AppContent() {
         <Route path="/admin/inventory" element={
           <AdminGuard>
             <Layout><AdminInventory /></Layout>
+          </AdminGuard>
+        } />
+        <Route path="/admin/notices" element={
+          <AdminGuard>
+            <Layout><NoticesManagement /></Layout>
           </AdminGuard>
         } />
         <Route path="/admin/schedule" element={

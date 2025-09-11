@@ -23,3 +23,21 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Development artifacts and temporary files
+.bolt/
+*_Optimization.md
+*_Guide.md
+*_Enhanced.md
+*_REPORT.md
+*_COMPARISON.md
+DATABASE_FIX.sql
+CLEANUP_*.md
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Build outputs
+build/
+out/
