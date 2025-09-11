@@ -28,6 +28,7 @@ interface AuthContextType extends AuthState {
     phone?: string;
     city?: string;
     blood_group?: string;
+    date_of_birth?: string;
   }) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -208,6 +209,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       phone?: string;
       city?: string;
       blood_group?: string;
+      date_of_birth?: string;
     }
   ) => {
     setState(prev => ({ ...prev, loading: true }));
@@ -232,6 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             phone: userData.phone || '',
             city: userData.city || '',
             blood_group: userData.blood_group || '',
+            date_of_birth: userData.date_of_birth || '',
           }
         }
       });

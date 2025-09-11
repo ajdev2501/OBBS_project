@@ -15,6 +15,7 @@ interface ProfileFormData {
   phone?: string;
   city?: string;
   blood_group?: BloodGroup;
+  date_of_birth?: string;
   last_donation_date?: string;
   notify_email?: boolean;
 }
@@ -62,6 +63,7 @@ export const useDonorProfile = (): UseDonorProfileReturn => {
       phone: '',
       city: '',
       blood_group: undefined,
+      date_of_birth: '',
       last_donation_date: '',
       notify_email: false,
     },
@@ -77,6 +79,7 @@ export const useDonorProfile = (): UseDonorProfileReturn => {
         phone: user.profile.phone || '',
         city: user.profile.city || '',
         blood_group: user.profile.blood_group || undefined,
+        date_of_birth: user.profile.date_of_birth || '',
         last_donation_date: user.profile.last_donation_date || '',
         notify_email: user.profile.notify_email || false,
       });
@@ -132,6 +135,7 @@ export const useDonorProfile = (): UseDonorProfileReturn => {
       user.profile.phone,
       user.profile.city,
       user.profile.blood_group,
+      user.profile.date_of_birth,
     ];
     
     const completedFields = fields.filter(field => field && field.trim() !== '').length;
@@ -146,6 +150,7 @@ export const useDonorProfile = (): UseDonorProfileReturn => {
       { key: 'phone', label: 'Phone Number', value: user.profile.phone },
       { key: 'city', label: 'City', value: user.profile.city },
       { key: 'blood_group', label: 'Blood Group', value: user.profile.blood_group },
+      { key: 'date_of_birth', label: 'Date of Birth', value: user.profile.date_of_birth },
     ];
     
     return fields
@@ -164,7 +169,14 @@ export const useDonorProfile = (): UseDonorProfileReturn => {
     setError(null);
 
     try {
-      await updateProfile(user.id, data);
+      // Transform empty date strings to null for database compatibility
+      const sanitizedData = {
+        ...data,
+        date_of_birth: data.date_of_birth?.trim() === '' ? null : data.date_of_birth,
+        last_donation_date: data.last_donation_date?.trim() === '' ? null : data.last_donation_date,
+      };
+
+      await updateProfile(user.id, sanitizedData);
       await refreshProfile();
       showToast('Profile updated successfully!', 'success');
     } catch (err) {

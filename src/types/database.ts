@@ -9,6 +9,7 @@ export interface Database {
           phone: string | null;
           city: string | null;
           blood_group: BloodGroup | null;
+          date_of_birth: string | null;
           last_donation_date: string | null;
           notify_email: boolean;
           created_at: string;
@@ -21,6 +22,7 @@ export interface Database {
           phone?: string | null;
           city?: string | null;
           blood_group?: BloodGroup | null;
+          date_of_birth?: string | null;
           last_donation_date?: string | null;
           notify_email?: boolean;
           created_at?: string;
@@ -33,6 +35,7 @@ export interface Database {
           phone?: string | null;
           city?: string | null;
           blood_group?: BloodGroup | null;
+          date_of_birth?: string | null;
           last_donation_date?: string | null;
           notify_email?: boolean;
           created_at?: string;
@@ -105,6 +108,7 @@ export interface Profile {
   phone: string | null;
   city: string | null;
   blood_group: BloodGroup | null;
+  date_of_birth: string | null;
   last_donation_date: string | null;
   notify_email: boolean;
   created_at: string;

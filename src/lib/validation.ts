@@ -11,6 +11,25 @@ export const ProfileSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits').optional(),
   city: z.string().min(2, 'City must be at least 2 characters').optional(),
   blood_group: BloodGroupSchema.optional(),
+  date_of_birth: z.string().refine((date) => {
+    // Allow empty string (optional field)
+    if (!date || date.trim() === '') return true;
+    
+    const birthDate = new Date(date);
+    
+    // Check if date is valid
+    if (isNaN(birthDate.getTime())) return false;
+    
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age >= 18 && age <= 80;
+  }, 'You must be between 18 and 80 years old to donate blood').optional(),
   last_donation_date: z.string().optional(),
   notify_email: z.boolean().default(true),
 });
@@ -67,4 +86,23 @@ export const RegisterSchema = LoginSchema.extend({
   phone: z.string().min(10, 'Phone number must be at least 10 digits').optional(),
   city: z.string().min(2, 'City must be at least 2 characters').optional(),
   blood_group: BloodGroupSchema.optional(),
+  date_of_birth: z.string().refine((date) => {
+    // Allow empty string (optional field)
+    if (!date || date.trim() === '') return true;
+    
+    const birthDate = new Date(date);
+    
+    // Check if date is valid
+    if (isNaN(birthDate.getTime())) return false;
+    
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age >= 18 && age <= 80;
+  }, 'You must be between 18 and 80 years old to donate blood').optional(),
 });

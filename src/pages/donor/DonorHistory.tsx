@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { 
   HeartIcon, 
@@ -19,6 +20,7 @@ import {
 import { Button } from '../../components/ui/Button';
 
 export const DonorHistory: React.FC = () => {
+  const navigate = useNavigate();
   const {
     donations,
     appointments,
@@ -107,7 +109,7 @@ export const DonorHistory: React.FC = () => {
                   description="Your first donation will appear here once completed."
                   action={
                     <Button
-                      onClick={() => window.location.href = '/donor/schedule'}
+                      onClick={() => navigate('/donor/schedule')}
                       className="bg-red-600 text-white hover:bg-red-700"
                     >
                       Schedule Donation
@@ -137,7 +139,7 @@ export const DonorHistory: React.FC = () => {
                   description="Schedule your first appointment to get started with blood donation."
                   action={
                     <Button
-                      onClick={() => window.location.href = '/donor/schedule'}
+                      onClick={() => navigate('/donor/schedule')}
                       className="bg-blue-600 text-white hover:bg-blue-700"
                     >
                       Schedule Appointment

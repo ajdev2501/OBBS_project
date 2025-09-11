@@ -13,7 +13,8 @@ export const CreateProfilePage: React.FC = () => {
     full_name: '',
     phone: '',
     city: '',
-    blood_group: ''
+    blood_group: '',
+    date_of_birth: ''
   });
   
   const navigate = useNavigate();
@@ -107,6 +108,14 @@ export const CreateProfilePage: React.FC = () => {
               value={formData.city}
               onChange={(e) => handleChange('city', e.target.value)}
               placeholder="Enter your city"
+            />
+
+            <Input
+              label="Date of Birth"
+              type="date"
+              value={formData.date_of_birth}
+              onChange={(e) => handleChange('date_of_birth', e.target.value)}
+              max={new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
             />
 
             <Select

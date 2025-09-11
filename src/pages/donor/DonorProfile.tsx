@@ -81,6 +81,15 @@ export const DonorProfile: React.FC = () => {
                 error={errors.city?.message}
               />
               
+              <Input
+                label="Date of Birth"
+                type="date"
+                {...register('date_of_birth')}
+                error={errors.date_of_birth?.message}
+                max={new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                helperText="Used for age verification and donor eligibility"
+              />
+              
               <Select
                 label="Blood Group"
                 options={bloodGroupOptions}

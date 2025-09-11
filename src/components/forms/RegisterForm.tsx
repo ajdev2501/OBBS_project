@@ -6,15 +6,9 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { bloodGroups } from '../../lib/validation';
+import { z } from 'zod';
 
-type RegisterFormData = {
-  email: string;
-  password: string;
-  full_name: string;
-  phone?: string;
-  city?: string;
-  blood_group?: string;
-};
+type RegisterFormData = z.infer<typeof RegisterSchema>;
 
 interface RegisterFormProps {
   onSubmit: (data: RegisterFormData) => void;
@@ -72,12 +66,22 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, loading = 
         />
       </div>
       
-      <Select
-        label="Blood Group"
-        options={bloodGroupOptions}
-        {...register('blood_group')}
-        error={errors.blood_group?.message}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Input
+          label="Date of Birth"
+          type="date"
+          {...register('date_of_birth')}
+          error={errors.date_of_birth?.message}
+          max={new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+        />
+        
+        <Select
+          label="Blood Group"
+          options={bloodGroupOptions}
+          {...register('blood_group')}
+          error={errors.blood_group?.message}
+        />
+      </div>
 
       <Button type="submit" loading={loading} className="w-full">
         Create Account

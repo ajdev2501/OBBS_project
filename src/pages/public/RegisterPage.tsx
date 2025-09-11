@@ -41,7 +41,13 @@ export const RegisterPage: React.FC = () => {
       await signUp(
         email as string, 
         password as string, 
-        userData as { full_name: string; phone?: string; city?: string; blood_group?: string }
+        userData as { 
+          full_name: string; 
+          phone?: string; 
+          city?: string; 
+          blood_group?: string;
+          date_of_birth?: string;
+        }
       );
       
       console.log('[RegisterPage] Registration successful');
