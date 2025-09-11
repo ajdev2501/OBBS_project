@@ -141,16 +141,16 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                 Admin Dashboard
               </h1>
-              <div className="flex items-center space-x-4">
-                <p className="text-lg text-gray-600">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
+                <p className="text-sm sm:text-lg text-gray-600">
                   Monitor and manage blood bank operations
                 </p>
                 <RealTimeIndicator 
@@ -160,25 +160,25 @@ export function AdminDashboard() {
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleExportData}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
               >
                 <ArrowDownTrayIcon className="w-4 h-4" />
-                <span>Export</span>
+                <span className="hidden sm:inline">Export</span>
               </Button>
               
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={refetchData}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
               >
                 <ArrowPathIcon className="w-4 h-4" />
-                <span>Refresh</span>
+                <span className="hidden sm:inline">Refresh</span>
               </Button>
             </div>
           </div>
@@ -191,7 +191,7 @@ export function AdminDashboard() {
         />
 
         {/* System Health Indicator */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <SystemHealthIndicator 
             health={criticalStats.systemHealth} 
             criticalStats={criticalStats} 
@@ -202,9 +202,9 @@ export function AdminDashboard() {
         <EnhancedStatsGrid stats={stats} loading={loading} />
 
         {/* Navigation Tabs */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+            <nav className="-mb-px flex overflow-x-auto scrollbar-hide">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -214,17 +214,18 @@ export function AdminDashboard() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      group inline-flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm
+                      group inline-flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap flex-shrink-0
                       ${isActive
                         ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }
                     `}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`} />
-                    <span>{tab.label}</span>
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.label.substring(0, 3)}</span>
                     {tab.badge && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         {tab.badge}
                       </span>
                     )}
@@ -236,26 +237,26 @@ export function AdminDashboard() {
         </div>
 
         {/* Tab Content */}
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
               {/* Inventory Chart */}
-              <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
+              <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4 sm:mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                     Blood Inventory Distribution
                   </h3>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-sm text-gray-500 hover:text-gray-700"
                     >
                       {viewMode === 'grid' ? 'List View' : 'Grid View'}
                     </button>
                   </div>
                 </div>
-                <div className="h-80">
+                <div className="h-64 sm:h-80">
                   <InventoryChart 
                     data={inventoryData} 
                   />
@@ -263,8 +264,8 @@ export function AdminDashboard() {
               </div>
 
               {/* System Notices */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
                   System Notices
                 </h3>
                 <NoticesList 
@@ -276,21 +277,21 @@ export function AdminDashboard() {
 
           {/* Inventory Tab */}
           {activeTab === 'inventory' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4 sm:mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                     Current Inventory
                   </h3>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-xs sm:text-sm text-gray-500">
                       Total Units: {stats.availableUnits.toLocaleString()}
                     </span>
                   </div>
                 </div>
                 
                 {/* Inventory Chart */}
-                <div className="h-96 mb-8">
+                <div className="h-64 sm:h-80 lg:h-96 mb-6 sm:mb-8">
                   <InventoryChart 
                     data={inventoryData} 
                   />
@@ -298,10 +299,10 @@ export function AdminDashboard() {
 
                 {/* Expiring Units Alert */}
                 {stats.expiringUnits > 0 && (
-                  <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
-                      <span className="text-yellow-800 font-medium">
+                      <ExclamationTriangleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm text-yellow-800 font-medium">
                         {stats.expiringUnits} units expiring within 7 days
                       </span>
                     </div>
@@ -313,36 +314,38 @@ export function AdminDashboard() {
 
           {/* Requests Tab */}
           {activeTab === 'requests' && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Auto-Allocation Banner */}
               <AutoAllocationBanner />
 
               {/* Requests Table */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                       Blood Requests Management
                     </h3>
                     <div className="flex items-center space-x-4">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-xs sm:text-sm text-gray-500">
                         {pendingRequests.length} pending requests
                       </span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="p-6">
-                  <EnhancedRequestsTable
-                    requests={allRequests}
-                    onApprove={handleApproveRequest}
-                    onReject={handleRejectRequest}
-                    onFulfill={handleFulfillRequest}
-                    onView={setViewingRequest}
-                    isAdmin={true}
-                    loading={loading}
-                    onRefresh={refetchData}
-                  />
+                <div className="p-3 sm:p-6">
+                  <div className="overflow-x-auto">
+                    <EnhancedRequestsTable
+                      requests={allRequests}
+                      onApprove={handleApproveRequest}
+                      onReject={handleRejectRequest}
+                      onFulfill={handleFulfillRequest}
+                      onView={setViewingRequest}
+                      isAdmin={true}
+                      loading={loading}
+                      onRefresh={refetchData}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,8 +353,8 @@ export function AdminDashboard() {
 
           {/* Notices Tab */}
           {activeTab === 'notices' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
                 All System Notices
               </h3>
               <NoticesList 
@@ -389,7 +392,7 @@ export function AdminDashboard() {
 
         {/* Error Display */}
         {error && (
-          <div className="fixed bottom-4 right-4 max-w-md">
+          <div className="fixed bottom-4 right-4 max-w-xs sm:max-w-md z-50">
             <ErrorDisplay 
               message={error}
             />
