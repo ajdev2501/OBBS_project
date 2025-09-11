@@ -9,15 +9,15 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
-  const { user, role, loading: authLoading, signIn } = useAuth();
+  const { user, role, loading: authLoading, profileLoaded, signIn } = useAuth();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
-  // Redirect if already logged in
+  // Redirect if already logged in and profile is loaded
   useEffect(() => {
-    console.log('[LoginPage] Auth state:', { user: !!user, role, authLoading });
+    console.log('[LoginPage] Auth state:', { user: !!user, role, authLoading, profileLoaded });
     
-    if (!authLoading && user) {
+    if (!authLoading && user && profileLoaded) {
       let redirectPath = from || '/';
       if (role === 'admin') {
         redirectPath = '/admin';
@@ -28,7 +28,7 @@ export const LoginPage: React.FC = () => {
       console.log('[LoginPage] Redirecting to:', redirectPath);
       navigate(redirectPath, { replace: true });
     }
-  }, [user, role, authLoading, navigate, from]);
+  }, [user, role, authLoading, profileLoaded, navigate, from]);
 
   const handleSubmit = async (data: { email: string; password: string }) => {
     console.log('[LoginPage] Attempting login for:', data.email);
@@ -47,13 +47,15 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Show loading while checking auth state
-  if (authLoading) {
+  // Show loading while checking auth state or profile is loading
+  if (authLoading || (user && !profileLoaded)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <p className="mt-2 text-gray-600">
+            {authLoading ? 'Loading...' : 'Loading your profile...'}
+          </p>
         </div>
       </div>
     );

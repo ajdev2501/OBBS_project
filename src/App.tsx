@@ -13,6 +13,7 @@ import { SearchPage } from './pages/public/SearchPage';
 import { RequestPage } from './pages/public/RequestPage';
 import { LoginPage } from './pages/public/LoginPage';
 import { RegisterPage } from './pages/public/RegisterPage';
+import { CreateProfilePage } from './pages/public/CreateProfilePage';
 
 // Donor Pages
 import { DonorHome } from './pages/donor/DonorHome';
@@ -23,7 +24,7 @@ import { DonorHistory } from './pages/donor/DonorHistory';
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminInventory } from './pages/admin/AdminInventory';
-import { ScheduleConfirmation } from './pages/admin/ScheduleConfirmation';
+import ScheduleConfirmation from './pages/admin/ScheduleConfirmation';
 
 function AppContent() {
   const { toast, hideToast } = useToast();
@@ -47,6 +48,7 @@ function AppContent() {
         <Route path="/request" element={<Layout><RequestPage /></Layout>} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/create-profile" element={<CreateProfilePage />} />
 
         {/* Donor Routes */}
         <Route path="/donor" element={
